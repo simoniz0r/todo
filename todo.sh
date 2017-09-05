@@ -70,7 +70,7 @@ todoaddfunc () {
                 ;;
             1)
                 echo -e "- \e[32m$TODO_ITEM\e[39m" > ~/.todo/"$LIST"/"$FILE_NAME"
-                echo -e "Item \"\e[33m$TODO_ITEM\e[39m\" added to $LIST list!"
+                echo -e "Item \"\e[32m$TODO_ITEM\e[39m\" added to $LIST list!"
                 ;;
             *)
                 echo -e "- \e[90m$TODO_ITEM\e[39m" > ~/.todo/"$LIST"/"$FILE_NAME"
@@ -196,7 +196,7 @@ todolistallfunc () {
     echo
     for dir in $(dir ~/.todo); do
         echo -e "$(tput bold)$dir$(tput sgr0):"
-        for file in $(dir -C -w 1 ~/.todo/"$LIST" | sort -n); do
+        for file in $(dir -C -w 1 ~/.todo/"$dir" | sort -n); do
             echo -e "$file $(cat ~/.todo/"$dir"/"$file")"
         done
         echo
