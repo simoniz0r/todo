@@ -31,7 +31,7 @@ Examples:
 }
 
 todoaddfunc () {
-    LIST="$(echo "$@" | cut -f2 -d" ")"
+    LIST="$(echo -e "$@" | cut -f2 -d" ")"
     if [ -z "$LIST" ]; then
         helpfunc
         exit 1
@@ -42,28 +42,58 @@ todoaddfunc () {
         mkdir ~/.todo/"$LIST"
         FILE_NAME="1"
     fi
-    TODO_ITEM="$(echo "$@" | cut -f3- -d" ")"
+    TODO_ITEM="$(echo -e "$@" | cut -f3- -d" ")"
     if [ -z "$TODO_ITEM" ]; then
-        echo "Item input required!"
+        echo -e "Item input required!"
         echo
         helpfunc
         exit 1
+    elif echo -e "$@" | cut -f3 -d" " | grep -q '='; then
+        IMPORTANT_LEVEL="$(echo -e "$@" | cut -f2 -d"=" | cut -f1 -d" ")"
+        TODO_ITEM="$(echo -e "$@" | cut -f4- -d" ")"
+        case $IMPORTANT_LEVEL in
+            5)
+                echo -e "- \e[31m$TODO_ITEM\e[39m" > ~/.todo/"$LIST"/"$FILE_NAME"
+                echo -e "Item \"\e[31m$TODO_ITEM\e[39m\" added to $LIST list!"
+                ;;
+            4)
+                echo -e "- \e[33m$TODO_ITEM\e[39m" > ~/.todo/"$LIST"/"$FILE_NAME"
+                echo -e "Item \"\e[33m$TODO_ITEM\e[39m\" added to $LIST list!"
+                ;;
+            3)
+                echo -e "- \e[34m$TODO_ITEM\e[39m" > ~/.todo/"$LIST"/"$FILE_NAME"
+                echo -e "Item \"\e[34m$TODO_ITEM\e[39m\" added to $LIST list!"
+                ;;
+            2)
+                echo -e "- \e[36m$TODO_ITEM\e[39m" > ~/.todo/"$LIST"/"$FILE_NAME"
+                echo -e "Item \"\e[36m$TODO_ITEM\e[39m\" added to $LIST list!"
+                ;;
+            1)
+                echo -e "- \e[32m$TODO_ITEM\e[39m" > ~/.todo/"$LIST"/"$FILE_NAME"
+                echo -e "Item \"\e[33m$TODO_ITEM\e[39m\" added to $LIST list!"
+                ;;
+            *)
+                echo -e "- \e[90m$TODO_ITEM\e[39m" > ~/.todo/"$LIST"/"$FILE_NAME"
+                echo -e "Item \"\e[90m$TODO_ITEM\e[39m\" added to $LIST list!"
+                ;;
+        esac
+    else
+        echo -e "- \e[39m$TODO_ITEM\e[39m" > ~/.todo/"$LIST"/"$FILE_NAME"
+        echo -e "Item \"$TODO_ITEM\" added to $LIST list!"
     fi
-    echo "- $TODO_ITEM" > ~/.todo/"$LIST"/"$FILE_NAME"
-    echo "Item \"$TODO_ITEM\" added to $LIST list!"
 }
 
 todoeditfunc () {
-    LIST="$(echo "$@" | cut -f2 -d" ")"
+    LIST="$(echo -e "$@" | cut -f2 -d" ")"
     if [ -z "$LIST" ]; then
         helpfunc
         exit 1
     fi
-    TODO_ITEM="$(echo "$@" | cut -f3 -d" ")"
+    TODO_ITEM="$(echo -e "$@" | cut -f3 -d" ")"
     if [ -f ~/.todo/"$LIST"/"$TODO_ITEM" ]; then
         $EDITOR ~/.todo/"$LIST"/"$TODO_ITEM"
     else
-        echo "Item $TODO_ITEM not found in $LIST!"
+        echo -e "Item $TODO_ITEM not found in $LIST!"
         echo
         helpfunc
         exit 1
@@ -71,20 +101,20 @@ todoeditfunc () {
 }
 
 tododonefunc () {
-    LIST="$(echo "$@" | cut -f2 -d" ")"
+    LIST="$(echo -e "$@" | cut -f2 -d" ")"
     if [ -z "$LIST" ]; then
         helpfunc
         exit 1
     fi
-    TODO_ITEM="$(echo "$@" | cut -f3 -d" ")"
+    TODO_ITEM="$(echo -e "$@" | cut -f3 -d" ")"
     if [ -f ~/.todo/"$LIST"/"$TODO_ITEM" ]; then
         DONE_TODO_ITEM="$(cat ~/.todo/"$LIST"/"$TODO_ITEM")"
         DONE_TODO_ITEM="${DONE_TODO_ITEM:1}"
-        sed -i s:-"$DONE_TODO_ITEM":✘"$DONE_TODO_ITEM":g ~/.todo/"$LIST"/"$TODO_ITEM"
-        echo "Item $TODO_ITEM marked as done in $LIST!"
+        sed -i s%-"$DONE_TODO_ITEM"%✘"$DONE_TODO_ITEM"%g ~/.todo/"$LIST"/"$TODO_ITEM"
+        echo -e "Item $TODO_ITEM marked as done in $LIST!"
         cat ~/.todo/"$LIST"/"$TODO_ITEM"
     else
-        echo "Item $TODO_ITEM not found in $LIST!"
+        echo -e "Item $TODO_ITEM not found in $LIST!"
         echo
         helpfunc
         exit 1
@@ -92,20 +122,20 @@ tododonefunc () {
 }
 
 todoundofunc () {
-    LIST="$(echo "$@" | cut -f2 -d" ")"
+    LIST="$(echo -e "$@" | cut -f2 -d" ")"
     if [ -z "$LIST" ]; then
         helpfunc
         exit 1
     fi
-    TODO_ITEM="$(echo "$@" | cut -f3 -d" ")"
+    TODO_ITEM="$(echo -e "$@" | cut -f3 -d" ")"
     if [ -f ~/.todo/"$LIST"/"$TODO_ITEM" ]; then
         DONE_TODO_ITEM="$(cat ~/.todo/"$LIST"/"$TODO_ITEM")"
         DONE_TODO_ITEM="${DONE_TODO_ITEM:1}"
         sed -i s:✘"$DONE_TODO_ITEM":-"$DONE_TODO_ITEM":g ~/.todo/"$LIST"/"$TODO_ITEM"
-        echo "Item $TODO_ITEM marked as not done in $LIST!"
+        echo -e "Item $TODO_ITEM marked as not done in $LIST!"
         cat ~/.todo/"$LIST"/"$TODO_ITEM"
     else
-        echo "Item $TODO_ITEM not found in $LIST!"
+        echo -e "Item $TODO_ITEM not found in $LIST!"
         echo
         helpfunc
         exit 1
@@ -113,14 +143,14 @@ todoundofunc () {
 }
 
 todormfunc () {
-    LIST="$(echo "$@" | cut -f2 -d" ")"
+    LIST="$(echo -e "$@" | cut -f2 -d" ")"
     if [ -z "$LIST" ]; then
         helpfunc
         exit 1
     fi
-    ITEM_CHECK="$(echo "$@" | cut -f3 -d" ")"
+    ITEM_CHECK="$(echo -e "$@" | cut -f3 -d" ")"
     if [ -z "$ITEM_CHECK" ]; then
-        echo "Item input required!"
+        echo -e "Item input required!"
         echo
         helpfunc
         exit 1
@@ -132,26 +162,26 @@ todormfunc () {
             case $RMANSWER in
                 y*|Y*)
                     rm -rf ~/.todo/"$LIST"
-                    echo "All items in $LIST have been removed!"
+                    echo -e "All items in $LIST have been removed!"
                     ;;
                 *)
-                    echo "Items in $LIST were not removed."
+                    echo -e "Items in $LIST were not removed."
                     ;;
             esac
             ;;
         *)
-            TODO_ITEM="$(echo "$@" | cut -f3 -d" ")"
+            TODO_ITEM="$(echo -e "$@" | cut -f3 -d" ")"
             if [ -z "$TODO_ITEM" ]; then
-                echo "Item input required!"
+                echo -e "Item input required!"
                 helpfunc
                 exit 1
             fi
             if [ -f ~/.todo/"$LIST"/"$TODO_ITEM" ]; then
-                echo "Item $TODO_ITEM removed from $LIST!"
+                echo -e "Item $TODO_ITEM removed from $LIST!"
                 cat ~/.todo/"$LIST"/"$TODO_ITEM"
                 rm ~/.todo/"$LIST"/"$TODO_ITEM"
             else
-                echo "Item $TODO_ITEM not found in $LIST!"
+                echo -e "Item $TODO_ITEM not found in $LIST!"
                 echo
                 helpfunc
                 exit 1
@@ -162,12 +192,12 @@ todormfunc () {
 
 todolistallfunc () {
     echo
-    echo "$(tput bold)All todo lists$(tput sgr0):"
+    echo -e "$(tput bold)All todo lists$(tput sgr0):"
     echo
     for dir in $(dir ~/.todo); do
-        echo "$(tput bold)$dir$(tput sgr0):"
-        for file in $(dir ~/.todo/$dir); do
-            echo "$file $(cat ~/.todo/"$dir"/"$file")"
+        echo -e "$(tput bold)$dir$(tput sgr0):"
+        for file in $(dir -C -w 1 ~/.todo/"$LIST" | sort -n); do
+            echo -e "$file $(cat ~/.todo/"$dir"/"$file")"
         done
         echo
     done
@@ -175,18 +205,18 @@ todolistallfunc () {
 
 todolistsinglefunc () {
     echo
-    echo "$(tput bold)$LIST$(tput sgr0):"
-    for file in $(dir ~/.todo/"$LIST"); do
-        echo "$file $(cat ~/.todo/"$LIST"/"$file")"
+    echo -e "$(tput bold)$LIST$(tput sgr0):"
+    for file in $(dir -C -w 1 ~/.todo/"$LIST" | sort -n); do
+        echo -e "$file $(cat ~/.todo/"$LIST"/"$file")"
     done
     echo
 }
 
 todolistfunc () {
-    LIST="$(echo "$@" | cut -f2 -d" ")"
+    LIST="$(echo -e "$@" | cut -f2 -d" ")"
     if [ -z "$LIST" ]; then
         if [ "$(dir ~/.todo | wc -w)" = "0" ]; then
-            echo "No lists made yet!"
+            echo -e "No lists made yet!"
             echo
             helpfunc
             exit 1
@@ -196,7 +226,7 @@ todolistfunc () {
         if [ -d ~/.todo/"$LIST" ]; then
             todolistsinglefunc "$LIST"
         else
-            echo "$LIST not found!"
+            echo -e "$LIST not found!"
             echo
             helpfunc
             exit 1
