@@ -2,7 +2,7 @@
 
 ![todo](/Screenshot.png)
 
-A simple scripts that manages todo lists in ~/.todo
+A simple script that manages todo lists in ~/.todo
 
 Usage: todo [OPTION] [ITEM]
 
