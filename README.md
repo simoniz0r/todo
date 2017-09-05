@@ -3,7 +3,7 @@ A simple scripts that manages todo lists in ~/.todo
 
 Usage: todo [OPTION] [ITEM]
 
-todo manages todo lists in an easy to use manner.-Lists are stored in ~/.todo/ListName
+todo manages todo lists in an easy to use manner.  Lists are stored in ~/.todo/ListName
 with each item in the list stored as a separate file in that directory.
 
 Options:
