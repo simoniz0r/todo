@@ -176,6 +176,12 @@ todormfunc () {
                 echo -e "Item $TODO_ITEM removed from $LIST!"
                 cat ~/.todo/"$LIST"/"$TODO_ITEM"
                 rm ~/.todo/"$LIST"/"$TODO_ITEM"
+                for file in $(dir ~/.todo/"$LIST"); do
+                    if [ "$file" -gt "$TODO_ITEM" ]; then
+                        FILE_NAME="$(($file-1))"
+                        mv ~/.todo/"$LIST"/"$file" ~/.todo/"$LIST"/"$FILE_NAME"
+                    fi
+                done
             else
                 echo -e "Item $TODO_ITEM not found in $LIST!"
                 exit 1
