@@ -110,7 +110,7 @@ tododonefunc () {
     if [ -f ~/.todo/"$LIST"/"$TODO_ITEM" ]; then
         DONE_TODO_ITEM="$(cat ~/.todo/"$LIST"/"$TODO_ITEM")"
         DONE_TODO_ITEM="${DONE_TODO_ITEM:1}"
-        sed -i s%- %✘ %g ~/.todo/"$LIST"/"$TODO_ITEM"
+        sed -i s%-%✘%g ~/.todo/"$LIST"/"$TODO_ITEM"
         echo -e "Item $TODO_ITEM marked as done in $LIST!"
         cat ~/.todo/"$LIST"/"$TODO_ITEM"
     else
@@ -129,7 +129,7 @@ todoundofunc () {
     if [ -f ~/.todo/"$LIST"/"$TODO_ITEM" ]; then
         DONE_TODO_ITEM="$(cat ~/.todo/"$LIST"/"$TODO_ITEM")"
         DONE_TODO_ITEM="${DONE_TODO_ITEM:1}"
-        sed -i s:✘ :- :g ~/.todo/"$LIST"/"$TODO_ITEM"
+        sed -i s:✘:-:g ~/.todo/"$LIST"/"$TODO_ITEM"
         echo -e "Item $TODO_ITEM marked as not done in $LIST!"
         cat ~/.todo/"$LIST"/"$TODO_ITEM"
     else
