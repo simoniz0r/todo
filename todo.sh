@@ -96,8 +96,6 @@ todoeditfunc () {
         $EDITOR ~/.todo/"$LIST"/"$TODO_ITEM"
     else
         echo -e "Item $TODO_ITEM not found in $LIST!"
-        echo
-        helpfunc
         exit 1
     fi
 }
@@ -117,8 +115,6 @@ tododonefunc () {
         cat ~/.todo/"$LIST"/"$TODO_ITEM"
     else
         echo -e "Item $TODO_ITEM not found in $LIST!"
-        echo
-        helpfunc
         exit 1
     fi
 }
@@ -138,8 +134,6 @@ todoundofunc () {
         cat ~/.todo/"$LIST"/"$TODO_ITEM"
     else
         echo -e "Item $TODO_ITEM not found in $LIST!"
-        echo
-        helpfunc
         exit 1
     fi
 }
@@ -184,8 +178,6 @@ todormfunc () {
                 rm ~/.todo/"$LIST"/"$TODO_ITEM"
             else
                 echo -e "Item $TODO_ITEM not found in $LIST!"
-                echo
-                helpfunc
                 exit 1
             fi
             ;;
@@ -216,21 +208,19 @@ todolistsinglefunc () {
 
 todolistfunc () {
     LIST="$(echo -e "$@" | cut -f2 -d" ")"
+    if [ "$(dir ~/.todo | wc -w)" = "0" ]; then
+        echo -e "No lists made yet!"
+        echo
+        helpfunc
+        exit 1
+    fi
     if [ -z "$LIST" ]; then
-        if [ "$(dir ~/.todo | wc -w)" = "0" ]; then
-            echo -e "No lists made yet!"
-            echo
-            helpfunc
-            exit 1
-        fi
         todolistallfunc
     else
         if [ -d ~/.todo/"$LIST" ]; then
             todolistsinglefunc "$LIST"
         else
             echo -e "$LIST not found!"
-            echo
-            helpfunc
             exit 1
         fi
     fi
