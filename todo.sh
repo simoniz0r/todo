@@ -15,6 +15,7 @@ Options:
     todo add list item          # Adds item to specified list
     todo add list i=n item      # Adds item to specified list with importance level n (4-0)
     todo edit list n            # Opens the default editor to edit item n in specified list
+    todo edit list n i=n        # Changes the importance level for item n to importance level n
     todo done list n            # Marks item n in specified list with an X to indicate it is done
     todo undo list n            # Removes X from item n in specified list to mark it as not done
     todo rm list n|all          # Removes n|all from list
@@ -27,6 +28,7 @@ Examples:
     todo done mylist 1          # Marks item 1 in mylist with an X to indicate it is done
     todo undo mylist 1          # Removes X from item 1 in mylist to mark it as not done
     todo edit mylist 1          # Opens the default editor to edit item 1 in mylist
+    todo edit mylist 1 i=4      # Change the importance level for item 1 in mylist to level 4
     todo rm mylist 1            # Removes item 1 from mylist
     todo rm mylist all          # Removes all items from mylist
 "
@@ -87,12 +89,49 @@ todoeditfunc () {
         helpfunc
         exit 1
     fi
-    TODO_ITEM="$(echo -e "$@" | cut -f3 -d" ")"
-    if [ -f ~/.todo/"$LIST"/"$TODO_ITEM" ]; then
-        $EDITOR ~/.todo/"$LIST"/"$TODO_ITEM"
+    if echo -e "$@" | cut -f4 -d" " | grep -q '='; then
+        IMPORTANT_LEVEL="$(echo -e "$@" | cut -f2 -d"=" | cut -f1 -d" ")"
+        TODO_ITEM="$(echo -e "$@" | cut -f3 -d" ")"
+        if [ -f ~/.todo/"$LIST"/"$TODO_ITEM" ]; then
+            case $IMPORTANT_LEVEL in
+                4)
+                    sed -i 's%- \x1b\[[0-9;]*m%- \x1b\[31m%g' ~/.todo/"$LIST"/"$TODO_ITEM"
+                    sed -i 's%✘ \x1b\[[0-9;]*m%- \x1b\[31m%g' ~/.todo/"$LIST"/"$TODO_ITEM"
+                    echo -e "Item \"$TODO_ITEM\" in $LIST changed to importance level 4!"
+                    ;;
+                3)
+                    sed -i 's%- \x1b\[[0-9;]*m%- \x1b\[33m%g' ~/.todo/"$LIST"/"$TODO_ITEM"
+                    sed -i 's%✘ \x1b\[[0-9;]*m%- \x1b\[33m%g' ~/.todo/"$LIST"/"$TODO_ITEM"
+                    echo -e "Item \"$TODO_ITEM\" in $LIST changed to importance level 3!"
+                    ;;
+                2)
+                    sed -i 's%- \x1b\[[0-9;]*m%- \x1b\[32m%g' ~/.todo/"$LIST"/"$TODO_ITEM"
+                    sed -i 's%✘ \x1b\[[0-9;]*m%- \x1b\[32m%g' ~/.todo/"$LIST"/"$TODO_ITEM"
+                    echo -e "Item \"$TODO_ITEM\" in $LIST changed to importance level 2!"
+                    ;;
+                0)
+                    sed -i 's%- \x1b\[[0-9;]*m%- \x1b\[90m%g' ~/.todo/"$LIST"/"$TODO_ITEM"
+                    sed -i 's%✘ \x1b\[[0-9;]*m%- \x1b\[90m%g' ~/.todo/"$LIST"/"$TODO_ITEM"
+                    echo -e "Item \"$TODO_ITEM\" in $LIST changed to importance level 0!"
+                    ;;
+                *)
+                    sed -i 's%- \x1b\[[0-9;]*m%- \x1b\[39m%g' ~/.todo/"$LIST"/"$TODO_ITEM"
+                    sed -i 's%✘ \x1b\[[0-9;]*m%- \x1b\[39m%g' ~/.todo/"$LIST"/"$TODO_ITEM"
+                    echo -e "Item \"$TODO_ITEM\" in $LIST changed to importance level 1!"
+                    ;;
+            esac
+        else
+            echo -e "Item $TODO_ITEM not found in $LIST!"
+            exit 1
+        fi
     else
-        echo -e "Item $TODO_ITEM not found in $LIST!"
-        exit 1
+        TODO_ITEM="$(echo -e "$@" | cut -f3 -d" ")"
+        if [ -f ~/.todo/"$LIST"/"$TODO_ITEM" ]; then
+            $EDITOR ~/.todo/"$LIST"/"$TODO_ITEM"
+        else
+            echo -e "Item $TODO_ITEM not found in $LIST!"
+            exit 1
+        fi
     fi
 }
 
