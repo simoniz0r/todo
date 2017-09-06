@@ -172,12 +172,16 @@ todormfunc () {
                 echo -e "Item $TODO_ITEM removed from $LIST!"
                 cat ~/.todo/"$LIST"/"$TODO_ITEM"
                 rm ~/.todo/"$LIST"/"$TODO_ITEM"
-                for file in $(dir -C -w 1 ~/.todo/"$LIST" | sort -n); do
-                    if [ "$file" -gt "$TODO_ITEM" ]; then
-                        FILE_NAME="$(($file-1))"
-                        mv ~/.todo/"$LIST"/"$file" ~/.todo/"$LIST"/"$FILE_NAME"
-                    fi
-                done
+                if [ "$(dir ~/.todo/"$LIST" | wc -w)" = "0" ]; then
+                    rm -r ~/.todo/"$LIST"
+                else
+                    for file in $(dir -C -w 1 ~/.todo/"$LIST" | sort -n); do
+                        if [ "$file" -gt "$TODO_ITEM" ]; then
+                            FILE_NAME="$(($file-1))"
+                            mv ~/.todo/"$LIST"/"$file" ~/.todo/"$LIST"/"$FILE_NAME"
+                        fi
+                    done
+                fi
             else
                 echo -e "Item $TODO_ITEM not found in $LIST!"
                 exit 1
@@ -253,7 +257,7 @@ case $1 in
         todormfunc "$@"
         exit 0
         ;;
-    help)
+    help|--help)
         helpfunc
         exit 0
         ;;
