@@ -16,8 +16,8 @@ Options:
     todo add list i=n item      # Adds item to specified list with importance level n (4-0)
     todo edit list n            # Opens the default editor to edit item n in specified list
     todo edit list n i=n        # Changes the importance level for item n to importance level n
-    todo done list n            # Marks item n in specified list with an X to indicate it is done
-    todo undo list n            # Removes X from item n in specified list to mark it as not done
+    todo done list n|all        # Marks item n or all items in specified list with an X
+    todo undo list n            # Removes X from item n or all items in specified list
     todo rm list n|all          # Removes n|all from list
 
 Examples:
@@ -25,8 +25,10 @@ Examples:
     todo mylist                 # Lists all items in mylist
     todo add mylist my item     # Adds my item to mylist
     todo add mylist i=4 item    # Adds item to mylist with importance level 4
-    todo done mylist 1          # Marks item 1 in mylist with an X to indicate it is done
-    todo undo mylist 1          # Removes X from item 1 in mylist to mark it as not done
+    todo done mylist 1          # Marks item 1 in mylist with an X
+    todo done mylist all        # Marks all items in mylist with an X
+    todo undo mylist 1          # Removes X from item 1 in mylist
+    todo undo mylist all        # Removes X from all items in mylist
     todo edit mylist 1          # Opens the default editor to edit item 1 in mylist
     todo edit mylist 1 i=4      # Change the importance level for item 1 in mylist to level 4
     todo rm mylist 1            # Removes item 1 from mylist
@@ -142,16 +144,30 @@ tododonefunc () {
         exit 1
     fi
     TODO_ITEM="$(echo -e "$@" | cut -f3 -d" ")"
-    if [ -f ~/.todo/"$LIST"/"$TODO_ITEM" ]; then
-        DONE_TODO_ITEM="$(cat ~/.todo/"$LIST"/"$TODO_ITEM")"
-        DONE_TODO_ITEM="${DONE_TODO_ITEM:1}"
-        sed -i 's%- %✘ %g' ~/.todo/"$LIST"/"$TODO_ITEM"
-        echo -e "Item $TODO_ITEM marked as done in $LIST!"
-        cat ~/.todo/"$LIST"/"$TODO_ITEM"
-    else
-        echo -e "Item $TODO_ITEM not found in $LIST!"
-        exit 1
-    fi
+    case $TODO_ITEM in
+        all)
+            for TODO_ITEM in $(dir -C -w 1 ~/.todo/"$LIST" | sort -n); do
+                if [ -f ~/.todo/"$LIST"/"$TODO_ITEM" ]; then
+                    sed -i 's%- %✘ %g' ~/.todo/"$LIST"/"$TODO_ITEM"
+                    echo -e "Item $TODO_ITEM marked as done in $LIST!"
+                    cat ~/.todo/"$LIST"/"$TODO_ITEM"
+                else
+                    echo -e "Item $TODO_ITEM not found in $LIST!"
+                    exit 1
+                fi
+            done
+            ;;
+        *)
+            if [ -f ~/.todo/"$LIST"/"$TODO_ITEM" ]; then
+                sed -i 's%- %✘ %g' ~/.todo/"$LIST"/"$TODO_ITEM"
+                echo -e "Item $TODO_ITEM marked as done in $LIST!"
+                cat ~/.todo/"$LIST"/"$TODO_ITEM"
+            else
+                echo -e "Item $TODO_ITEM not found in $LIST!"
+                exit 1
+            fi
+            ;;
+    esac
 }
 
 todoundofunc () {
@@ -161,16 +177,30 @@ todoundofunc () {
         exit 1
     fi
     TODO_ITEM="$(echo -e "$@" | cut -f3 -d" ")"
-    if [ -f ~/.todo/"$LIST"/"$TODO_ITEM" ]; then
-        DONE_TODO_ITEM="$(cat ~/.todo/"$LIST"/"$TODO_ITEM")"
-        DONE_TODO_ITEM="${DONE_TODO_ITEM:1}"
-        sed -i 's%✘ %- %g' ~/.todo/"$LIST"/"$TODO_ITEM"
-        echo -e "Item $TODO_ITEM marked as not done in $LIST!"
-        cat ~/.todo/"$LIST"/"$TODO_ITEM"
-    else
-        echo -e "Item $TODO_ITEM not found in $LIST!"
-        exit 1
-    fi
+    case $TODO_ITEM in
+        all)
+            for TODO_ITEM in $(dir -C -w 1 ~/.todo/"$LIST" | sort -n); do
+                if [ -f ~/.todo/"$LIST"/"$TODO_ITEM" ]; then
+                    sed -i 's%✘ %- %g' ~/.todo/"$LIST"/"$TODO_ITEM"
+                    echo -e "Item $TODO_ITEM marked as not done in $LIST!"
+                    cat ~/.todo/"$LIST"/"$TODO_ITEM"
+                else
+                    echo -e "Item $TODO_ITEM not found in $LIST!"
+                    exit 1
+                fi
+            done
+            ;;
+        *)
+            if [ -f ~/.todo/"$LIST"/"$TODO_ITEM" ]; then
+                sed -i 's%✘ %- %g' ~/.todo/"$LIST"/"$TODO_ITEM"
+                echo -e "Item $TODO_ITEM marked as not done in $LIST!"
+                cat ~/.todo/"$LIST"/"$TODO_ITEM"
+            else
+                echo -e "Item $TODO_ITEM not found in $LIST!"
+                exit 1
+            fi
+            ;;
+    esac
 }
 
 todormfunc () {
