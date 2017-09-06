@@ -146,10 +146,10 @@ tododonefunc () {
     TODO_ITEM="$(echo -e "$@" | cut -f3 -d" ")"
     case $TODO_ITEM in
         all)
+            echo "Marking all items in $LIST as done..."
             for TODO_ITEM in $(dir -C -w 1 ~/.todo/"$LIST" | sort -n); do
                 if [ -f ~/.todo/"$LIST"/"$TODO_ITEM" ]; then
                     sed -i 's%- %✘ %g' ~/.todo/"$LIST"/"$TODO_ITEM"
-                    echo -e "Item $TODO_ITEM marked as done in $LIST!"
                     cat ~/.todo/"$LIST"/"$TODO_ITEM"
                 else
                     echo -e "Item $TODO_ITEM not found in $LIST!"
@@ -179,10 +179,10 @@ todoundofunc () {
     TODO_ITEM="$(echo -e "$@" | cut -f3 -d" ")"
     case $TODO_ITEM in
         all)
+            echo "Marking all items in $LIST as not done..."
             for TODO_ITEM in $(dir -C -w 1 ~/.todo/"$LIST" | sort -n); do
                 if [ -f ~/.todo/"$LIST"/"$TODO_ITEM" ]; then
                     sed -i 's%✘ %- %g' ~/.todo/"$LIST"/"$TODO_ITEM"
-                    echo -e "Item $TODO_ITEM marked as not done in $LIST!"
                     cat ~/.todo/"$LIST"/"$TODO_ITEM"
                 else
                     echo -e "Item $TODO_ITEM not found in $LIST!"
