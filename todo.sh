@@ -15,7 +15,7 @@ Options:
     todo add list item          # Adds item to specified list
     todo add i=n list item      # Adds item to specified list with importance level n (4-0)
     todo edit list item#        # Opens the default editor to edit specified list item#
-    todo done list item#        # Marks an item# in list or specified list with an X to indicate it is done
+    todo done list item#        # Marks an item# in specified list with an X to indicate it is done
     todo undo list item#        # Removes X from specified item# in list to mark it as not done
     todo rm list item#          # Removes item# from list
 
