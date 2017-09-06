@@ -13,7 +13,7 @@ with each item in the list stored as a separate file in that directory.
 Options:
     todo                        # Lists all lists or items in specified list
     todo add list item          # Adds item to specified list
-    todo add i=n list item      # Adds item to specified list with importance level n (5-0)
+    todo add i=n list item      # Adds item to specified list with importance level n (4-0)
     todo edit list item#        # Opens the default editor to edit specified list item#
     todo done list item#        # Marks an item# in list or specified list with an X to indicate it is done
     todo undo list item#        # Removes X from specified item# in list to mark it as not done
@@ -23,7 +23,7 @@ Examples:
     todo                        # Lists all items in all todo lists
     todo mylist                 # Lists all items in mylist
     todo add mylist my item     # Adds my item to mylist
-    todo add i=5 mylist item    # Adds item to mylist with importance level 5
+    todo add i=4 mylist item    # Adds item to mylist with importance level 4
     todo done mylist 1          # Marks item 1 in mylist with an X to indicate it is done
     todo undo mylist 1          # Removes X from item 1 in mylist to mark it as not done
     todo edit mylist 1          # Opens the default editor to edit item 1 in mylist
@@ -54,29 +54,25 @@ todoaddfunc () {
         IMPORTANT_LEVEL="$(echo -e "$@" | cut -f2 -d"=" | cut -f1 -d" ")"
         TODO_ITEM="$(echo -e "$@" | cut -f4- -d" ")"
         case $IMPORTANT_LEVEL in
-            5)
+            4)
                 echo -e "- \e[31m$TODO_ITEM\e[39m" > ~/.todo/"$LIST"/"$FILE_NAME"
                 echo -e "Item \"\e[31m$TODO_ITEM\e[39m\" added to $LIST list!"
                 ;;
-            4)
+            3)
                 echo -e "- \e[33m$TODO_ITEM\e[39m" > ~/.todo/"$LIST"/"$FILE_NAME"
                 echo -e "Item \"\e[33m$TODO_ITEM\e[39m\" added to $LIST list!"
                 ;;
-            3)
-                echo -e "- \e[34m$TODO_ITEM\e[39m" > ~/.todo/"$LIST"/"$FILE_NAME"
-                echo -e "Item \"\e[34m$TODO_ITEM\e[39m\" added to $LIST list!"
-                ;;
             2)
-                echo -e "- \e[36m$TODO_ITEM\e[39m" > ~/.todo/"$LIST"/"$FILE_NAME"
-                echo -e "Item \"\e[36m$TODO_ITEM\e[39m\" added to $LIST list!"
-                ;;
-            1)
                 echo -e "- \e[32m$TODO_ITEM\e[39m" > ~/.todo/"$LIST"/"$FILE_NAME"
                 echo -e "Item \"\e[32m$TODO_ITEM\e[39m\" added to $LIST list!"
                 ;;
-            *)
+            0)
                 echo -e "- \e[90m$TODO_ITEM\e[39m" > ~/.todo/"$LIST"/"$FILE_NAME"
                 echo -e "Item \"\e[90m$TODO_ITEM\e[39m\" added to $LIST list!"
+                ;;
+            *)
+                echo -e "- \e[39m$TODO_ITEM\e[39m" > ~/.todo/"$LIST"/"$FILE_NAME"
+                echo -e "Item \"\e[39m$TODO_ITEM\e[39m\" added to $LIST list!"
                 ;;
         esac
     else
@@ -176,7 +172,7 @@ todormfunc () {
                 echo -e "Item $TODO_ITEM removed from $LIST!"
                 cat ~/.todo/"$LIST"/"$TODO_ITEM"
                 rm ~/.todo/"$LIST"/"$TODO_ITEM"
-                for file in $(dir ~/.todo/"$LIST"); do
+                for file in $(dir -C -w 1 ~/.todo/"$LIST" | sort -n); do
                     if [ "$file" -gt "$TODO_ITEM" ]; then
                         FILE_NAME="$(($file-1))"
                         mv ~/.todo/"$LIST"/"$file" ~/.todo/"$LIST"/"$FILE_NAME"
