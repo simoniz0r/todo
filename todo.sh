@@ -269,6 +269,9 @@ todomvfunc () {
     if [ -z "$LIST" ]; then
         helpfunc
         exit 1
+    elif [ ! -d ~/.todo/"$LIST" ]; then
+        echo "$LIST does not exist!"
+        exit 1
     fi
     TODO_ITEM_1="$(echo -e "$@" | cut -f3 -d" ")"
     TODO_ITEM_2="$(echo -e "$@" | cut -f4 -d" ")"
