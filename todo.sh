@@ -329,28 +329,6 @@ todomvfunc () {
     esac
 }
 
-todolistallfunc () {
-    echo
-    echo -e "$(tput bold)All todo lists$(tput sgr0):"
-    echo
-    for dir in $(dir ~/.todo); do
-        echo -e "$(tput bold)$dir$(tput sgr0):"
-        for file in $(dir -C -w 1 ~/.todo/"$dir" | sort -n); do
-            echo -e "$file $(cat ~/.todo/"$dir"/"$file")"
-        done
-        echo
-    done
-}
-
-todolistsinglefunc () {
-    echo
-    echo -e "$(tput bold)$LIST$(tput sgr0):"
-    for file in $(dir -C -w 1 ~/.todo/"$LIST" | sort -n); do
-        echo -e "$file $(cat ~/.todo/"$LIST"/"$file")"
-    done
-    echo
-}
-
 todolistfunc () {
     LIST="$(echo -e "$@" | cut -f2 -d" ")"
     if [ "$(dir ~/.todo | wc -w)" = "0" ]; then
@@ -360,10 +338,24 @@ todolistfunc () {
         exit 1
     fi
     if [ -z "$LIST" ]; then
-        todolistallfunc
+        echo
+        echo -e "$(tput bold)All todo lists$(tput sgr0):"
+        echo
+        for dir in $(dir ~/.todo); do
+            echo -e "$(tput bold)$dir$(tput sgr0):"
+            for file in $(dir -C -w 1 ~/.todo/"$dir" | sort -n); do
+                echo -e "$file $(cat ~/.todo/"$dir"/"$file")"
+            done
+            echo
+        done
     else
         if [ -d ~/.todo/"$LIST" ]; then
-            todolistsinglefunc "$LIST"
+                echo
+                echo -e "$(tput bold)$LIST$(tput sgr0):"
+                for file in $(dir -C -w 1 ~/.todo/"$LIST" | sort -n); do
+                    echo -e "$file $(cat ~/.todo/"$LIST"/"$file")"
+                done
+                echo
         else
             echo -e "$LIST not found!"
             exit 1
