@@ -19,6 +19,7 @@ Options:
     todo done list n|all        # Marks item n or all items in specified list with an X
     todo undo list n|all        # Removes X from item n or all items in specified list
     todo mv list n n|list2      # Moves item n from list to n|list2
+    todo mv list n -f|-l        # Moves item n to first or last position in list
     todo mv list list2          # Moves all items from list to list2
     todo rm list n|all          # Removes n|all from list
 
@@ -34,6 +35,8 @@ Examples:
     todo edit mylist 1          # Opens the default editor to edit item 1 in mylist
     todo edit mylist 1 i=4      # Change the importance level for item 1 in mylist to level 4
     todo mv mylist 1 2          # Moves item 1 from mylist to position 2
+    todo mv mylist 3 -f         # Moves item 3 to first position in mylist
+    todo mv mylist 1 -l         # Moves item 1 to last position in mylist
     todo mv mylist 1 mylist2    # Moves item 1 from mylist to mylist2
     todo mv mylist mylist2      # Moves all items from mylist to mylist2
     todo rm mylist 1            # Removes item 1 from mylist
@@ -288,6 +291,32 @@ todomvfunc () {
                     mv ~/.todo/"$LIST"/"$TODO_ITEM_2" ~/.todo/"$LIST"/"$TODO_ITEM_1"
                     mv ~/.todo/"$LIST"/"$TODO_ITEM_1"-temp ~/.todo/"$LIST"/"$TODO_ITEM_2"
                     echo "Item $TODO_ITEM_1 moved to position $TODO_ITEM_2 in $LIST!"
+                    ;;
+                -f)
+                    if [ "$TODO_ITEM_1" = "1" ]; then
+                        echo "Item $TODO_ITEM_1 is already in first position in $LIST!"
+                        exit 1
+                    fi
+                    for file in $(dir -C -w 1 ~/.todo/"$LIST" | grep -v "$TODO_ITEM_1" | sort -n); do
+                        mv ~/.todo/"$LIST"/"$file" ~/.todo/"$LIST"/"$file"-temp
+                    done
+                    mv ~/.todo/"$LIST"/"$TODO_ITEM_1" ~/.todo/"$LIST"/1
+                    for file in $(dir -C -w 1 ~/.todo/"$LIST" | grep '.*-temp' | sort -n); do
+                        FILE_NAME="$(($(echo "$file" | cut -f1 -d"-")+1))"
+                        mv ~/.todo/"$LIST"/"$file" ~/.todo/"$LIST"/"$FILE_NAME"
+                    done
+                    echo "Item $TODO_ITEM_1 moved to first position in $LIST!"
+                    ;;
+                -l)
+                    FILE_NAME="$(($(dir ~/.todo/"$LIST" | wc -w)+1))"
+                    mv ~/.todo/"$LIST"/"$TODO_ITEM_1" ~/.todo/"$LIST"/"$FILE_NAME"
+                    for file in $(dir -C -w 1 ~/.todo/"$LIST" | sort -n); do
+                        if [ "$file" -gt "$TODO_ITEM_1" ]; then
+                            FILE_NAME="$(($file-1))"
+                            mv ~/.todo/"$LIST"/"$file" ~/.todo/"$LIST"/"$FILE_NAME"
+                        fi
+                    done
+                    echo "Item $TODO_ITEM_1 moved to last position in $LIST!"
                     ;;
                 *)
                     LIST_2="$TODO_ITEM_2"
