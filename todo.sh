@@ -5,25 +5,11 @@
 # License: GPL v2 Only
 
 helpfunc () {
-printf "Usage: todo [OPTION] [ITEM]
-
-todo manages todo lists in an easy to use manner.  Lists are stored in ~/.todo/ListName
-with each item in the list stored as a separate file in that directory.
-
-Options:
-    todo                        # Lists all lists or items in specified list
-    todo add list item          # Adds item to specified list
-    todo add list i=n item      # Adds item to specified list with importance level n (4-0)
-    todo edit list n            # Opens the default editor to edit item n in specified list
-    todo edit list n i=n        # Changes the importance level for item n to importance level n
-    todo done list n|all        # Marks item n or all items in specified list with an X
-    todo undo list n|all        # Removes X from item n or all items in specified list
-    todo mv list n n|list2      # Moves item n from list to n|list2
-    todo mv list n -f|-l        # Moves item n to first or last position in list
-    todo mv list list2          # Moves all items from list to list2
-    todo rm list n|all          # Removes n|all from list
-
-Examples:
+HELP_OPTION="$(echo -e "$@" | cut -f2 -d" ")"
+case $HELP_OPTION in
+e*|E*|-e*|--e*)
+printf "
+todo usage examples:
     todo                        # Lists all items in all todo lists
     todo mylist                 # Lists all items in mylist
     todo add mylist my item     # Adds my item to mylist
@@ -41,7 +27,34 @@ Examples:
     todo mv mylist mylist2      # Moves all items from mylist to mylist2
     todo rm mylist 1            # Removes item 1 from mylist
     todo rm mylist all          # Removes all items from mylist
+
 "
+;;
+*)
+printf "Usage: todo [OPTION] [ITEM]
+
+todo manages todo lists in an easy to use manner.  Lists are stored in ~/.todo/ListName
+with each item in the list stored as a separate file in that directory.
+
+Options:
+    todo                        # Lists all lists or items in specified list
+    todo add list item          # Adds item to specified list
+    todo add list i=n item      # Adds item to specified list with importance level n (4-0)
+    todo edit list n            # Opens the default editor to edit item n in specified list
+    todo edit list n i=n        # Changes the importance level for item n to importance level n
+    todo done list n|all        # Marks item n or all items in specified list with an X
+    todo undo list n|all        # Removes X from item n or all items in specified list
+    todo mv list n n|list2      # Moves item n from list to n|list2
+    todo mv list n -f|-l        # Moves item n to first or last position in list
+    todo mv list list2          # Moves all items from list to list2
+    todo rm list n|all          # Removes n|all from list
+    todo help                   # Show this help output
+
+See 'todo help examples' for usage examples.
+
+"
+;;
+esac
 }
 
 todoaddfunc () {
@@ -422,7 +435,7 @@ case $1 in
         exit 0
         ;;
     help|--help)
-        helpfunc
+        helpfunc "$@"
         exit 0
         ;;
     *)
