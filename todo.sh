@@ -281,6 +281,108 @@ todormfunc () {
     esac
 }
 
+todomvwithinlistfunc () {
+    if [ ! -f ~/.todo/"$LIST"/"$TODO_ITEM_1" ] || [ ! -f ~/.todo/"$LIST"/"$TODO_ITEM_2" ]; then
+        echo "Items $TODO_ITEM_1 and/or $TODO_ITEM_2 not found in $LIST!"
+        exit 1
+    fi
+    mv ~/.todo/"$LIST"/"$TODO_ITEM_1" ~/.todo/"$LIST"/"$TODO_ITEM_1"-save
+    if [ "$TODO_ITEM_1" -gt "$TODO_ITEM_2" ]; then
+        for file in $(dir -C -w 1 ~/.todo/"$LIST" | grep -v "$TODO_ITEM_1" | sort -n); do
+            if [ "$file" -le "$TODO_ITEM_1" ]; then
+                mv ~/.todo/"$LIST"/"$file" ~/.todo/"$LIST"/"$file"-temp
+            fi
+        done
+        for file in $(dir -C -w 1 ~/.todo/"$LIST" | grep '.*-temp' | sort -n);do
+            FILE_NAME="$(echo "$file" | cut -f1 -d"-")"
+            if [ "$FILE_NAME" -le "$TODO_ITEM_1" ]; then
+                FILE_NAME="$(($FILE_NAME+1))"
+                mv ~/.todo/"$LIST"/"$file" ~/.todo/"$LIST"/"$FILE_NAME"
+            fi
+        done
+    else
+        for file in $(dir -C -w 1 ~/.todo/"$LIST" | grep -v "$TODO_ITEM_1" | sort -n); do
+            if [ "$file" -le "$TODO_ITEM_2" ]; then
+                mv ~/.todo/"$LIST"/"$file" ~/.todo/"$LIST"/"$file"-temp
+            fi
+        done
+        for file in $(dir -C -w 1 ~/.todo/"$LIST" | grep '.*-temp' | sort -n);do
+            FILE_NAME="$(echo "$file" | cut -f1 -d"-")"
+            if [ "$FILE_NAME" -le "$TODO_ITEM_2" ]; then
+                FILE_NAME="$(($FILE_NAME-1))"
+                mv ~/.todo/"$LIST"/"$file" ~/.todo/"$LIST"/"$FILE_NAME"
+            fi
+        done
+    fi
+    mv ~/.todo/"$LIST"/"$TODO_ITEM_1"-save ~/.todo/"$LIST"/"$TODO_ITEM_2"
+    echo "Item $TODO_ITEM_1 moved to position $TODO_ITEM_2 in $LIST!"
+}
+
+todomvfirstfunc () {
+    if [ "$TODO_ITEM_1" = "1" ]; then
+        echo "Item $TODO_ITEM_1 is already in first position in $LIST!"
+        exit 1
+    fi
+    for file in $(dir -C -w 1 ~/.todo/"$LIST" | grep -v "$TODO_ITEM_1" | sort -n); do
+        mv ~/.todo/"$LIST"/"$file" ~/.todo/"$LIST"/"$file"-temp
+    done
+    mv ~/.todo/"$LIST"/"$TODO_ITEM_1" ~/.todo/"$LIST"/1
+    for file in $(dir -C -w 1 ~/.todo/"$LIST" | grep '.*-temp' | sort -n); do
+        FILE_NAME="$(($(echo "$file" | cut -f1 -d"-")+1))"
+        mv ~/.todo/"$LIST"/"$file" ~/.todo/"$LIST"/"$FILE_NAME"
+    done
+    echo "Item $TODO_ITEM_1 moved to first position in $LIST!"
+}
+
+todomvlastfunc () {
+    FILE_NAME="$(($(dir ~/.todo/"$LIST" | wc -w)+1))"
+    mv ~/.todo/"$LIST"/"$TODO_ITEM_1" ~/.todo/"$LIST"/"$FILE_NAME"
+    for file in $(dir -C -w 1 ~/.todo/"$LIST" | sort -n); do
+        if [ "$file" -gt "$TODO_ITEM_1" ]; then
+            FILE_NAME="$(($file-1))"
+            mv ~/.todo/"$LIST"/"$file" ~/.todo/"$LIST"/"$FILE_NAME"
+        fi
+    done
+    echo "Item $TODO_ITEM_1 moved to last position in $LIST!"
+}
+
+todomvitemlistfunc () {
+    LIST_2="$TODO_ITEM_2"
+    if [ ! -f ~/.todo/"$LIST"/"$TODO_ITEM_1" ]; then
+        echo "Item $TODO_ITEM_1 not found in $LIST!"
+        exit 1
+    fi
+    if [ ! -d ~/.todo/"$LIST_2" ]; then
+        mkdir ~/.todo/"$LIST_2"
+    fi
+    FILE_NAME="$(($(dir ~/.todo/"$LIST_2" | wc -w)+1))"
+    mv ~/.todo/"$LIST"/"$TODO_ITEM_1" ~/.todo/"$LIST_2"/"$FILE_NAME"
+    echo "Item $TODO_ITEM_1 has been moved from $LIST to $LIST_2!"
+    if [ "$(dir ~/.todo/"$LIST" | wc -w)" = "0" ]; then
+        rm -r ~/.todo/"$LIST"
+    else
+        for file in $(dir -C -w 1 ~/.todo/"$LIST" | sort -n); do
+            if [ "$file" -gt "$TODO_ITEM_1" ]; then
+                FILE_NAME="$(($file-1))"
+                mv ~/.todo/"$LIST"/"$file" ~/.todo/"$LIST"/"$FILE_NAME"
+            fi
+        done
+    fi
+}
+
+todomvlistlistfunc () {
+    LIST_2="$TODO_ITEM_1"
+    if [ ! -d ~/.todo/"$LIST_2" ]; then
+        mkdir ~/.todo/"$LIST_2"
+    fi
+    for item in $(dir -C -w 1 ~/.todo/"$LIST" | sort -n);do
+        FILE_NAME="$(($(dir ~/.todo/"$LIST_2" | wc -w)+1))"
+        mv ~/.todo/"$LIST"/"$item" ~/.todo/"$LIST_2"/"$FILE_NAME"
+    done
+    echo "All items in $LIST moved to $LIST_2!"
+    rm -r ~/.todo/"$LIST"
+}
+
 todomvfunc () {
     LIST="$(echo -e "$@" | cut -f2 -d" ")"
     if [ -z "$LIST" ]; then
@@ -292,81 +394,29 @@ todomvfunc () {
     fi
     TODO_ITEM_1="$(echo -e "$@" | cut -f3 -d" ")"
     TODO_ITEM_2="$(echo -e "$@" | cut -f4 -d" ")"
+    if [ "$TODO_ITEM_1" = "$TODO_ITEM_2" ];then
+        echo "$TODO_ITEM_1 and $TODO_ITEM_2 are the same!"
+        exit 1
+    fi
     case $TODO_ITEM_1 in
         1*|2*|3*|4*|5*|6*|7*|8*|9*)
             case $TODO_ITEM_2 in
                 1*|2*|3*|4*|5*|6*|7*|8*|9*)
-                    if [ ! -f ~/.todo/"$LIST"/"$TODO_ITEM_1" ] || [ ! -f ~/.todo/"$LIST"/"$TODO_ITEM_2" ]; then
-                        echo "Items $TODO_ITEM_1 and/or $TODO_ITEM_2 not found in $LIST!"
-                        exit 1
-                    fi
-                    mv ~/.todo/"$LIST"/"$TODO_ITEM_1" ~/.todo/"$LIST"/"$TODO_ITEM_1"-temp
-                    mv ~/.todo/"$LIST"/"$TODO_ITEM_2" ~/.todo/"$LIST"/"$TODO_ITEM_1"
-                    mv ~/.todo/"$LIST"/"$TODO_ITEM_1"-temp ~/.todo/"$LIST"/"$TODO_ITEM_2"
-                    echo "Item $TODO_ITEM_1 moved to position $TODO_ITEM_2 in $LIST!"
+                    todomvwithinlistfunc
                     ;;
                 -f)
-                    if [ "$TODO_ITEM_1" = "1" ]; then
-                        echo "Item $TODO_ITEM_1 is already in first position in $LIST!"
-                        exit 1
-                    fi
-                    for file in $(dir -C -w 1 ~/.todo/"$LIST" | grep -v "$TODO_ITEM_1" | sort -n); do
-                        mv ~/.todo/"$LIST"/"$file" ~/.todo/"$LIST"/"$file"-temp
-                    done
-                    mv ~/.todo/"$LIST"/"$TODO_ITEM_1" ~/.todo/"$LIST"/1
-                    for file in $(dir -C -w 1 ~/.todo/"$LIST" | grep '.*-temp' | sort -n); do
-                        FILE_NAME="$(($(echo "$file" | cut -f1 -d"-")+1))"
-                        mv ~/.todo/"$LIST"/"$file" ~/.todo/"$LIST"/"$FILE_NAME"
-                    done
-                    echo "Item $TODO_ITEM_1 moved to first position in $LIST!"
+                    todomvfirstfunc
                     ;;
                 -l)
-                    FILE_NAME="$(($(dir ~/.todo/"$LIST" | wc -w)+1))"
-                    mv ~/.todo/"$LIST"/"$TODO_ITEM_1" ~/.todo/"$LIST"/"$FILE_NAME"
-                    for file in $(dir -C -w 1 ~/.todo/"$LIST" | sort -n); do
-                        if [ "$file" -gt "$TODO_ITEM_1" ]; then
-                            FILE_NAME="$(($file-1))"
-                            mv ~/.todo/"$LIST"/"$file" ~/.todo/"$LIST"/"$FILE_NAME"
-                        fi
-                    done
-                    echo "Item $TODO_ITEM_1 moved to last position in $LIST!"
+                    todomvlastfunc
                     ;;
                 *)
-                    LIST_2="$TODO_ITEM_2"
-                    if [ ! -f ~/.todo/"$LIST"/"$TODO_ITEM_1" ]; then
-                        echo "Item $TODO_ITEM_1 not found in $LIST!"
-                        exit 1
-                    fi
-                    if [ ! -d ~/.todo/"$LIST_2" ]; then
-                        mkdir ~/.todo/"$LIST_2"
-                    fi
-                    FILE_NAME="$(($(dir ~/.todo/"$LIST_2" | wc -w)+1))"
-                    mv ~/.todo/"$LIST"/"$TODO_ITEM_1" ~/.todo/"$LIST_2"/"$FILE_NAME"
-                    echo "Item $TODO_ITEM_1 has been moved from $LIST to $LIST_2!"
-                    if [ "$(dir ~/.todo/"$LIST" | wc -w)" = "0" ]; then
-                        rm -r ~/.todo/"$LIST"
-                    else
-                        for file in $(dir -C -w 1 ~/.todo/"$LIST" | sort -n); do
-                            if [ "$file" -gt "$TODO_ITEM_1" ]; then
-                                FILE_NAME="$(($file-1))"
-                                mv ~/.todo/"$LIST"/"$file" ~/.todo/"$LIST"/"$FILE_NAME"
-                            fi
-                        done
-                    fi
+                    todomvitemlistfunc
                     ;;
             esac
             ;;
         *)
-            LIST_2="$TODO_ITEM_1"
-            if [ ! -d ~/.todo/"$LIST_2" ]; then
-                mkdir ~/.todo/"$LIST_2"
-            fi
-            for item in $(dir -C -w 1 ~/.todo/"$LIST" | sort -n);do
-                FILE_NAME="$(($(dir ~/.todo/"$LIST_2" | wc -w)+1))"
-                mv ~/.todo/"$LIST"/"$item" ~/.todo/"$LIST_2"/"$FILE_NAME"
-            done
-            echo "All items in $LIST moved to $LIST_2!"
-            rm -r ~/.todo/"$LIST"
+            todomvlistlistfunc
             ;;
     esac
 }
