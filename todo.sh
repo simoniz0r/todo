@@ -8,8 +8,7 @@ helpfunc () {
 HELP_OPTION="$(echo -e "$@" | cut -f2 -d" ")"
 case $HELP_OPTION in
 e*|E*|-e*|--e*)
-printf "
-todo usage examples:
+printf "todo usage examples:
     todo                        # Lists all items in all todo lists
     todo mylist                 # Lists all items in mylist
     todo add mylist my item     # Adds my item to mylist
