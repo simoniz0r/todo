@@ -18,6 +18,8 @@ Options:
     todo edit list n i=n        # Changes the importance level for item n to importance level n
     todo done list n|all        # Marks item n or all items in specified list with an X
     todo undo list n|all        # Removes X from item n or all items in specified list
+    todo mv list n n|list2      # Moves item n from list to n|list2
+    todo mv list list2          # Moves all items from list to list2
     todo rm list n|all          # Removes n|all from list
 
 Examples:
@@ -31,6 +33,9 @@ Examples:
     todo undo mylist all        # Removes X from all items in mylist
     todo edit mylist 1          # Opens the default editor to edit item 1 in mylist
     todo edit mylist 1 i=4      # Change the importance level for item 1 in mylist to level 4
+    todo mv mylist 1 2          # Moves item 1 from mylist to position 2
+    todo mv mylist 1 mylist2    # Moves item 1 from mylist to mylist2
+    todo mv mylist mylist2      # Moves all items from mylist to mylist2
     todo rm mylist 1            # Removes item 1 from mylist
     todo rm mylist all          # Removes all items from mylist
 "
@@ -259,6 +264,67 @@ todormfunc () {
     esac
 }
 
+todomvfunc () {
+    LIST="$(echo -e "$@" | cut -f2 -d" ")"
+    if [ -z "$LIST" ]; then
+        helpfunc
+        exit 1
+    fi
+    TODO_ITEM_1="$(echo -e "$@" | cut -f3 -d" ")"
+    TODO_ITEM_2="$(echo -e "$@" | cut -f4 -d" ")"
+    case $TODO_ITEM_1 in
+        1*|2*|3*|4*|5*|6*|7*|8*|9*)
+            case $TODO_ITEM_2 in
+                1*|2*|3*|4*|5*|6*|7*|8*|9*)
+                    if [ ! -f ~/.todo/"$LIST"/"$TODO_ITEM_1" ] || [ ! -f ~/.todo/"$LIST"/"$TODO_ITEM_2" ]; then
+                        echo "Items $TODO_ITEM_1 and/or $TODO_ITEM_2 not found in $LIST!"
+                        exit 1
+                    fi
+                    mv ~/.todo/"$LIST"/"$TODO_ITEM_1" ~/.todo/"$LIST"/"$TODO_ITEM_1"-temp
+                    mv ~/.todo/"$LIST"/"$TODO_ITEM_2" ~/.todo/"$LIST"/"$TODO_ITEM_1"
+                    mv ~/.todo/"$LIST"/"$TODO_ITEM_1"-temp ~/.todo/"$LIST"/"$TODO_ITEM_2"
+                    echo "Item $TODO_ITEM_1 moved to position $TODO_ITEM_2 in $LIST!"
+                    ;;
+                *)
+                    LIST_2="$TODO_ITEM_2"
+                    if [ ! -f ~/.todo/"$LIST"/"$TODO_ITEM_1" ]; then
+                        echo "Item $TODO_ITEM_1 not found in $LIST!"
+                        exit 1
+                    fi
+                    if [ ! -d ~/.todo/"$LIST_2" ]; then
+                        mkdir ~/.todo/"$LIST_2"
+                    fi
+                    FILE_NAME="$(($(dir ~/.todo/"$LIST_2" | wc -w)+1))"
+                    mv ~/.todo/"$LIST"/"$TODO_ITEM_1" ~/.todo/"$LIST_2"/"$FILE_NAME"
+                    echo "Item $TODO_ITEM_1 has been moved from $LIST to $LIST_2!"
+                    if [ "$(dir ~/.todo/"$LIST" | wc -w)" = "0" ]; then
+                        rm -r ~/.todo/"$LIST"
+                    else
+                        for file in $(dir -C -w 1 ~/.todo/"$LIST" | sort -n); do
+                            if [ "$file" -gt "$TODO_ITEM_1" ]; then
+                                FILE_NAME="$(($file-1))"
+                                mv ~/.todo/"$LIST"/"$file" ~/.todo/"$LIST"/"$FILE_NAME"
+                            fi
+                        done
+                    fi
+                    ;;
+            esac
+            ;;
+        *)
+            LIST_2="$TODO_ITEM_1"
+            if [ ! -d ~/.todo/"$LIST_2" ]; then
+                mkdir ~/.todo/"$LIST_2"
+            fi
+            for item in $(dir -C -w 1 ~/.todo/"$LIST" | sort -n);do
+                FILE_NAME="$(($(dir ~/.todo/"$LIST_2" | wc -w)+1))"
+                mv ~/.todo/"$LIST"/"$item" ~/.todo/"$LIST_2"/"$FILE_NAME"
+            done
+            echo "All items in $LIST moved to $LIST_2!"
+            rm -r ~/.todo/"$LIST"
+            ;;
+    esac
+}
+
 todolistallfunc () {
     echo
     echo -e "$(tput bold)All todo lists$(tput sgr0):"
@@ -320,6 +386,10 @@ case $1 in
         ;;
     undo)
         todoundofunc "$@"
+        exit 0
+        ;;
+    mv)
+        todomvfunc "$@"
         exit 0
         ;;
     rm)
