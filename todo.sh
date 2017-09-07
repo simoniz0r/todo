@@ -289,7 +289,7 @@ todomvwithinlistfunc () {
     mv ~/.todo/"$LIST"/"$TODO_ITEM_1" ~/.todo/"$LIST"/"$TODO_ITEM_1"-save
     if [ "$TODO_ITEM_1" -gt "$TODO_ITEM_2" ]; then
         for file in $(dir -C -w 1 ~/.todo/"$LIST" | grep -v "$TODO_ITEM_1" | sort -n); do
-            if [ "$file" -le "$TODO_ITEM_1" ]; then
+            if [ "$file" -le "$TODO_ITEM_1" ] && [ "$file" -ge "$TODO_ITEM_2" ]; then
                 mv ~/.todo/"$LIST"/"$file" ~/.todo/"$LIST"/"$file"-temp
             fi
         done
@@ -302,7 +302,7 @@ todomvwithinlistfunc () {
         done
     else
         for file in $(dir -C -w 1 ~/.todo/"$LIST" | grep -v "$TODO_ITEM_1" | sort -n); do
-            if [ "$file" -le "$TODO_ITEM_2" ]; then
+            if [ "$file" -le "$TODO_ITEM_2" ] && [ "$file" -ge "$TODO_ITEM_1" ]; then
                 mv ~/.todo/"$LIST"/"$file" ~/.todo/"$LIST"/"$file"-temp
             fi
         done
