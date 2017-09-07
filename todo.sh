@@ -17,7 +17,7 @@ Options:
     todo edit list n            # Opens the default editor to edit item n in specified list
     todo edit list n i=n        # Changes the importance level for item n to importance level n
     todo done list n|all        # Marks item n or all items in specified list with an X
-    todo undo list n            # Removes X from item n or all items in specified list
+    todo undo list n|all        # Removes X from item n or all items in specified list
     todo rm list n|all          # Removes n|all from list
 
 Examples:
