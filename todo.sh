@@ -8,7 +8,8 @@ helpfunc () {
 HELP_OPTION="$(echo -e "$@" | cut -f2 -d" ")"
 case $HELP_OPTION in
 e*|E*|-e*|--e*)
-printf "todo usage examples:
+printf "
+todo usage examples:
     todo                        # Lists all items in all todo lists
     todo mylist                 # Lists all items in mylist
     todo add mylist my item     # Adds my item to mylist
@@ -30,7 +31,8 @@ printf "todo usage examples:
 "
 ;;
 *)
-printf "Usage: todo [OPTION] [ITEM]
+printf "
+Usage: todo [OPTION] [ITEM]
 
 todo manages todo lists in an easy to use manner.  Lists are stored in ~/.todo/ListName
 with each item in the list stored as a separate file in that directory.
@@ -50,7 +52,6 @@ Options:
     todo help                   # Show this help output
 
 See 'todo help examples' for usage examples.
-
 "
 ;;
 esac
