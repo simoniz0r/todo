@@ -290,7 +290,7 @@ todomvwithinlistfunc () {
                 mv ~/.todo/"$LIST"/"$file" ~/.todo/"$LIST"/"$file"-temp
             fi
         done
-        for file in $(dir -C -w 1 ~/.todo/"$LIST" | grep '.*-temp' | sort -n);do
+        for file in $(dir -C -w 1 ~/.todo/"$LIST" | grep '.*-temp' | sort -n); do
             FILE_NAME="$(echo "$file" | cut -f1 -d"-")"
             if [ "$FILE_NAME" -le "$TODO_ITEM_1" ]; then
                 FILE_NAME="$(($FILE_NAME+1))"
@@ -303,7 +303,7 @@ todomvwithinlistfunc () {
                 mv ~/.todo/"$LIST"/"$file" ~/.todo/"$LIST"/"$file"-temp
             fi
         done
-        for file in $(dir -C -w 1 ~/.todo/"$LIST" | grep '.*-temp' | sort -n);do
+        for file in $(dir -C -w 1 ~/.todo/"$LIST" | grep '.*-temp' | sort -n); do
             FILE_NAME="$(echo "$file" | cut -f1 -d"-")"
             if [ "$FILE_NAME" -le "$TODO_ITEM_2" ]; then
                 FILE_NAME="$(($FILE_NAME-1))"
@@ -344,7 +344,7 @@ todomvlistlistfunc () {
     if [ ! -d ~/.todo/"$LIST_2" ]; then
         mkdir ~/.todo/"$LIST_2"
     fi
-    for item in $(dir -C -w 1 ~/.todo/"$LIST" | sort -n);do
+    for item in $(dir -C -w 1 ~/.todo/"$LIST" | sort -n); do
         FILE_NAME="$(($(dir ~/.todo/"$LIST_2" | wc -w)+1))"
         mv ~/.todo/"$LIST"/"$item" ~/.todo/"$LIST_2"/"$FILE_NAME"
     done
@@ -402,7 +402,11 @@ todolistfunc () {
         for dir in $(dir ~/.todo); do
             echo -e "$(tput bold)$dir$(tput sgr0):"
             for file in $(dir -C -w 1 ~/.todo/"$dir" | sort -n); do
-                echo -e "$file $(cat ~/.todo/"$dir"/"$file")"
+                if [ "$file" -lt "10" ]; then
+                    echo -e " $file $(cat ~/.todo/"$dir"/"$file")"
+                else
+                    echo -e "$file $(cat ~/.todo/"$dir"/"$file")"
+                fi
             done
             echo
         done
@@ -411,7 +415,11 @@ todolistfunc () {
                 echo
                 echo -e "$(tput bold)$LIST$(tput sgr0):"
                 for file in $(dir -C -w 1 ~/.todo/"$LIST" | sort -n); do
-                    echo -e "$file $(cat ~/.todo/"$LIST"/"$file")"
+                    if [ "$file" -lt "10" ]; then
+                        echo -e " $file $(cat ~/.todo/"$dir"/"$file")"
+                    else
+                        echo -e "$file $(cat ~/.todo/"$dir"/"$file")"
+                    fi
                 done
                 echo
         else
