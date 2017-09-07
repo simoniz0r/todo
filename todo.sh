@@ -394,8 +394,11 @@ todomvfunc () {
     fi
     TODO_ITEM_1="$(echo -e "$@" | cut -f3 -d" ")"
     TODO_ITEM_2="$(echo -e "$@" | cut -f4 -d" ")"
-    if [ "$TODO_ITEM_1" = "$TODO_ITEM_2" ];then
+    if [ "$TODO_ITEM_1" = "$TODO_ITEM_2" ]; then
         echo "$TODO_ITEM_1 and $TODO_ITEM_2 are the same!"
+        exit 1
+    elif [ "$TODO_ITEM_1" = "$LIST" ]; then
+        echo "$TODO_ITEM_1 and $LIST are the same!"
         exit 1
     fi
     case $TODO_ITEM_1 in
