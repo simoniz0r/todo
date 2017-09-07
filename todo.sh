@@ -47,19 +47,20 @@ todoaddfunc () {
         helpfunc
         exit 1
     fi
-    if [ -d ~/.todo/"$LIST" ]; then
-        FILE_NAME="$(($(dir ~/.todo/"$LIST" | wc -w)+1))"
-    else
-        mkdir ~/.todo/"$LIST"
-        FILE_NAME="1"
-    fi
     TODO_ITEM="$(echo -e "$@" | cut -f3- -d" ")"
     if [ -z "$TODO_ITEM" ]; then
         echo -e "Item input required!"
         echo
         helpfunc
         exit 1
-    elif echo -e "$@" | cut -f3 -d" " | grep -q '='; then
+    fi
+    if [ -d ~/.todo/"$LIST" ]; then
+        FILE_NAME="$(($(dir ~/.todo/"$LIST" | wc -w)+1))"
+    else
+        mkdir ~/.todo/"$LIST"
+        FILE_NAME="1"
+    fi
+    if echo -e "$@" | cut -f3 -d" " | grep -q '='; then
         IMPORTANT_LEVEL="$(echo -e "$@" | cut -f2 -d"=" | cut -f1 -d" ")"
         TODO_ITEM="$(echo -e "$@" | cut -f4- -d" ")"
         case $IMPORTANT_LEVEL in
