@@ -98,27 +98,27 @@ todoeditfunc () {
             case $IMPORTANT_LEVEL in
                 4)
                     sed -i 's%- \x1b\[[0-9;]*m%- \x1b\[31m%g' ~/.todo/"$LIST"/"$TODO_ITEM"
-                    sed -i 's%✘ \x1b\[[0-9;]*m%- \x1b\[31m%g' ~/.todo/"$LIST"/"$TODO_ITEM"
+                    sed -i 's%✘ \x1b\[[0-9;]*m%✘ \x1b\[31m%g' ~/.todo/"$LIST"/"$TODO_ITEM"
                     echo -e "Item \"$TODO_ITEM\" in $LIST changed to importance level 4!"
                     ;;
                 3)
                     sed -i 's%- \x1b\[[0-9;]*m%- \x1b\[33m%g' ~/.todo/"$LIST"/"$TODO_ITEM"
-                    sed -i 's%✘ \x1b\[[0-9;]*m%- \x1b\[33m%g' ~/.todo/"$LIST"/"$TODO_ITEM"
+                    sed -i 's%✘ \x1b\[[0-9;]*m%✘ \x1b\[33m%g' ~/.todo/"$LIST"/"$TODO_ITEM"
                     echo -e "Item \"$TODO_ITEM\" in $LIST changed to importance level 3!"
                     ;;
                 2)
                     sed -i 's%- \x1b\[[0-9;]*m%- \x1b\[32m%g' ~/.todo/"$LIST"/"$TODO_ITEM"
-                    sed -i 's%✘ \x1b\[[0-9;]*m%- \x1b\[32m%g' ~/.todo/"$LIST"/"$TODO_ITEM"
+                    sed -i 's%✘ \x1b\[[0-9;]*m%✘ \x1b\[32m%g' ~/.todo/"$LIST"/"$TODO_ITEM"
                     echo -e "Item \"$TODO_ITEM\" in $LIST changed to importance level 2!"
                     ;;
                 0)
                     sed -i 's%- \x1b\[[0-9;]*m%- \x1b\[90m%g' ~/.todo/"$LIST"/"$TODO_ITEM"
-                    sed -i 's%✘ \x1b\[[0-9;]*m%- \x1b\[90m%g' ~/.todo/"$LIST"/"$TODO_ITEM"
+                    sed -i 's%✘ \x1b\[[0-9;]*m%✘ \x1b\[90m%g' ~/.todo/"$LIST"/"$TODO_ITEM"
                     echo -e "Item \"$TODO_ITEM\" in $LIST changed to importance level 0!"
                     ;;
                 *)
                     sed -i 's%- \x1b\[[0-9;]*m%- \x1b\[39m%g' ~/.todo/"$LIST"/"$TODO_ITEM"
-                    sed -i 's%✘ \x1b\[[0-9;]*m%- \x1b\[39m%g' ~/.todo/"$LIST"/"$TODO_ITEM"
+                    sed -i 's%✘ \x1b\[[0-9;]*m%✘ \x1b\[39m%g' ~/.todo/"$LIST"/"$TODO_ITEM"
                     echo -e "Item \"$TODO_ITEM\" in $LIST changed to importance level 1!"
                     ;;
             esac
