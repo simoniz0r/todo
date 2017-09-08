@@ -433,6 +433,19 @@ if [ ! -d ~/.todo ]; then
     mkdir ~/.todo
 fi
 
+if type todo >/dev/null 2>&1 && [ -f ~/.zshrc ] && ! grep -q 'todo.comp' ~/.zshrc; then
+    REALPATH="$(readlink -f $0)"
+    RUNNING_DIR="$(dirname "$REALPATH")"
+    if [ -f "$RUNNING_DIR"/todo.comp ]; then
+        cp "$RUNNING_DIR"/todo.comp ~/.todo/.todo.comp
+        echo "" >> ~/.zshrc
+        echo "if [ -f ~/.todo/.todo.comp ]; then" >> ~/.zshrc
+        echo "    source ~/.todo/.todo.comp" >> ~/.zshrc
+        echo "    compdef _todo todo" >> ~/.zshrc
+        echo "fi" >> ~/.zshrc
+    fi
+fi
+
 case $1 in
     add)
         todoaddfunc "$@"

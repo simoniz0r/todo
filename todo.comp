@@ -1,0 +1,32 @@
+#!/bin/bash
+# Title: todo
+# Description: A bash script that manages todo lists
+# Dependencies: coreutils
+# Author: simonizor
+# Website: http://www.simonizor.gq
+# License: GPL v2.0 only
+
+_todo () {
+    local curcontext="$curcontext" state line
+    typeset -A opt_args
+ 
+    _arguments \
+        '1: :->args'\
+        '2: :->input'
+ 
+    case $state in
+    args)
+        LIST="$(dir -C -w 1 ~/.todo | tr '\n' ' ')"
+        _arguments "1:arguments:(add edit done undo mv rm help $LIST)"
+        ;;
+    input)
+        case $words[2] in
+        add|edit|done|undo|mv|rm)
+            compadd "$@" $(dir -C -w 1 ~/.todo | tr '\n' ' ')
+            ;;
+        help)
+            compadd "$@" examples
+            ;;
+        esac
+    esac
+}
