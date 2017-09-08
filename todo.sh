@@ -416,9 +416,9 @@ todolistfunc () {
                 echo -e "$(tput bold)$LIST$(tput sgr0):"
                 for file in $(dir -C -w 1 ~/.todo/"$LIST" | sort -n); do
                     if [ "$file" -lt "10" ]; then
-                        echo -e " $file $(cat ~/.todo/"$dir"/"$file")"
+                        echo -e " $file $(cat ~/.todo/"$LIST"/"$file")"
                     else
-                        echo -e "$file $(cat ~/.todo/"$dir"/"$file")"
+                        echo -e "$file $(cat ~/.todo/"$LIST"/"$file")"
                     fi
                 done
                 echo
