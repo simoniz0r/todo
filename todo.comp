@@ -6,6 +6,10 @@
 # Website: http://www.simonizor.gq
 # License: GPL v2.0 only
 
+if [ -z "$TODO_DIR" ]; then
+    TODO_DIR="$HOME/.todo"
+fi
+
 _todo () {
     local curcontext="$curcontext" state line
     typeset -A opt_args
@@ -16,13 +20,13 @@ _todo () {
  
     case $state in
     args)
-        LIST="$(dir -C -w 1 ~/.todo | tr '\n' ' ')"
+        LIST="$(dir -C -w 1 "$TODO_DIR" | tr '\n' ' ')"
         _arguments "1:arguments:(add edit done undo mv rm help $LIST)"
         ;;
     input)
         case $words[2] in
         add|edit|done|undo|mv|rm)
-            compadd "$@" $(dir -C -w 1 ~/.todo | tr '\n' ' ')
+            compadd "$@" $(dir -C -w 1 "$TODO_DIR" | tr '\n' ' ')
             ;;
         help)
             compadd "$@" examples
