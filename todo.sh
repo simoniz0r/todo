@@ -447,6 +447,12 @@ if type todo >/dev/null 2>&1 && [ -f ~/.zshrc ] && ! grep -q 'todo.comp' ~/.zshr
         echo "    compdef _todo todo" >> ~/.zshrc
         echo "fi" >> ~/.zshrc
     fi
+elif type todo >/dev/null 2>&1 && [ -f ~/.zshrc ]; then
+    REALPATH="$(readlink -f $0)"
+    RUNNING_DIR="$(dirname "$REALPATH")"
+    if [ -f "$RUNNING_DIR"/todo.comp ]; then
+        cp "$RUNNING_DIR"/todo.comp "$TODO_DIR"/.todo.comp
+    fi
 fi
 
 case $1 in

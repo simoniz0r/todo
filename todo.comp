@@ -20,13 +20,13 @@ _todo () {
  
     case $state in
     args)
-        LIST="$(dir -C -w 1 "$TODO_DIR" | tr '\n' ' ')"
+        LIST="$(dir "$TODO_DIR" | sed 's%  % %g')"
         _arguments "1:arguments:(add edit done undo mv rm help $LIST)"
         ;;
     input)
         case $words[2] in
         add|edit|done|undo|mv|rm)
-            compadd "$@" $(dir -C -w 1 "$TODO_DIR" | tr '\n' ' ')
+            compadd "$@" $(dir "$TODO_DIR" | sed 's%  % %g')
             ;;
         help)
             compadd "$@" examples
